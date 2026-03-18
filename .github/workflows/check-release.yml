@@ -33,3 +33,10 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git tag "${NEW_VERSION}"
           git push origin "${NEW_VERSION}"
+
+      - name: Trigger publish workflow
+        if: steps.check.outputs.new_version != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NEW_VERSION: ${{ steps.check.outputs.new_version }}
+        run: gh workflow run pypi.yml -f version="${NEW_VERSION}"
