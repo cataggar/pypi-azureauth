@@ -6,12 +6,15 @@ on:
   pull_request:
     branches: [main]
 
+permissions: {}
+
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
-      - run: uv run python -c "import azureauth_bin; print(azureauth_bin.__version__)"
-        env:
-          PYTHONPATH: python
+      - uses: extractions/setup-just@v3
+
+      - name: Check
+        run: just check
