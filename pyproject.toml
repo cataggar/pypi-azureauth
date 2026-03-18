@@ -1,0 +1,24 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "azureauth-bin"
+dynamic = ["version"]
+description = "Microsoft Authentication CLI repackaged as Python wheels"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.9"
+
+[project.urls]
+Homepage = "https://github.com/AzureAD/microsoft-authentication-cli"
+Repository = "https://github.com/cataggar/pypi-azureauth"
+
+[project.scripts]
+azureauth = "azureauth_bin:main"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.targets.wheel]
+packages = ["python/azureauth_bin"]
