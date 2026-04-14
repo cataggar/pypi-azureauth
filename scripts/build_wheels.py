@@ -160,9 +160,9 @@ def _is_executable(path: Path, binary_name: str) -> bool:
 
 
 _EXEC_ATTR = (
-    stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH
+    stat.S_IFREG | stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH
 ) << 16
-_FILE_ATTR = (stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IROTH) << 16
+_FILE_ATTR = (stat.S_IFREG | stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IROTH) << 16
 
 
 def build_wheel(version: str, platform_key: str, info: dict[str, str], dist_dir: Path) -> Path:
@@ -189,6 +189,9 @@ def build_wheel(version: str, platform_key: str, info: dict[str, str], dist_dir:
         # Use the binary's parent directory as the source for files
         files_dir = binary_path.parent
 
+        data_scripts_dir = f"{DIST_NAME}-{version}.data/scripts"
+        dist_info_dir = f"{DIST_NAME}-{version}.dist-info"
+
         # Collect wheel entries: (arcname, data_bytes, is_executable)
         entries: list[tuple[str, bytes, bool]] = []
 
@@ -198,17 +201,14 @@ def build_wheel(version: str, platform_key: str, info: dict[str, str], dist_dir:
             (f"{IMPORT_NAME}/__init__.py", init_py.read_bytes(), False)
         )
 
-        # Add all files from the directory containing the binary
+        # Add all runtime files to data/scripts/ for co-location with the binary
         for fpath in sorted(files_dir.rglob("*")):
             if not fpath.is_file():
                 continue
             rel = fpath.relative_to(files_dir).as_posix()
-            arcname = f"{IMPORT_NAME}/{rel}"
+            arcname = f"{data_scripts_dir}/{rel}"
             executable = _is_executable(fpath, binary_name)
             entries.append((arcname, fpath.read_bytes(), executable))
-
-        # dist-info directory
-        dist_info_dir = f"{DIST_NAME}-{version}.dist-info"
 
         readme_path = Path(__file__).resolve().parent.parent / "README.md"
         readme_text = readme_path.read_text(encoding="utf-8")
@@ -235,10 +235,7 @@ def build_wheel(version: str, platform_key: str, info: dict[str, str], dist_dir:
         )
         entries.append((f"{dist_info_dir}/WHEEL", wheel_meta.encode(), False))
 
-        entry_points = f"[console_scripts]\nazureauth = {IMPORT_NAME}:main\n"
-        entries.append(
-            (f"{dist_info_dir}/entry_points.txt", entry_points.encode(), False)
-        )
+        # No entry_points.txt — binaries are installed directly via data/scripts
 
         # Build RECORD
         records: list[str] = []
