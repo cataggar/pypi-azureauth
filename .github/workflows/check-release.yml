@@ -1,9 +1,7 @@
 name: Check for new azureauth release
 
 on:
-  schedule:
-    - cron: "0 8 * * *" # Daily at 08:00 UTC
-  workflow_dispatch: {} # Allow manual triggers
+  workflow_dispatch: {} # Disabled scheduled checks (package is deprecated)
 
 permissions: {}
 

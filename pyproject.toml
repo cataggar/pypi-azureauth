@@ -5,10 +5,13 @@ build-backend = "hatchling.build"
 [project]
 name = "azureauth-bin"
 dynamic = ["version"]
-description = "Microsoft Authentication CLI repackaged as Python wheels"
+description = "DEPRECATED: Use 'ghr install azuread/microsoft-authentication-cli@0.9.7' instead (https://cataggar.github.io/ghr/)"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.9"
+classifiers = [
+    "Development Status :: 7 - Inactive",
+]
 
 [project.urls]
 Homepage = "https://github.com/AzureAD/microsoft-authentication-cli"
